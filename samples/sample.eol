@@ -1,0 +1,5 @@
+import "foo.bar";
+
+operation foo() {
+  return 5;
+}

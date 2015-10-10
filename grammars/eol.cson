@@ -1,0 +1,491 @@
+'scopeName': 'source.eol'
+'name': 'EOL'
+'comment': 'Epsilon Object Language'
+'fileTypes': [
+  'eol'
+]
+'foldingStartMarker': '({|\\()\\s*$'
+'foldingStopMarker': '(}|\\))\\s*$'
+'patterns': [
+  {
+    'comment': 'Block comments'
+    'begin': '/\\*'
+    'end': '\\*/'
+    'captures':
+      '0':
+        'name': 'punctuation.definition.comment.eol'
+    'name': 'comment.block.eol'
+  }
+  {
+    'comment': 'Line comments'
+    'begin': '//'
+    'beginCaptures':
+      '0':
+        'name': 'punctuation.definition.comment.eol'
+    'end': '$'
+    'name': 'comment.line.double-slash.eol'
+  }
+  {
+    'comment': 'Interpreted string literals'
+    'begin': '"'
+    'beginCaptures':
+      '0':
+        'name': 'punctuation.definition.string.begin.eol'
+    'end': '"'
+    'endCaptures':
+      '0':
+        'name': 'punctuation.definition.string.end.eol'
+    'name': 'string.quoted.double.eol'
+    'patterns': [
+      {
+        'include': '#string_escaped_char'
+      }
+      {
+        'include': '#string_placeholder'
+      }
+    ]
+  }
+  {
+    'comment': 'Special names'
+    'begin': '`'
+    'beginCaptures':
+      '0':
+        'name': 'punctuation.definition.string.begin.eol'
+    'end': '`'
+    'endCaptures':
+      '0':
+        'name': 'punctuation.definition.string.end.eol'
+    'name': 'string.quoted.raw.eol',
+    'patterns': [
+      {
+        'include': '#string_placeholder'
+      }
+    ]
+  }
+  {
+    'comment': 'Syntax error receiving channels'
+    'match': '<\\-([\\t ]+)chan\\b'
+    'captures':
+      '1':
+        'name': 'invalid.illegal.receive-channel.eol'
+  }
+  {
+    'comment': 'Syntax error sending channels'
+    'match': '\\bchan([\\t ]+)<\-'
+    'captures':
+      '1':
+        'name': 'invalid.illegal.send-channel.eol'
+  }
+  {
+    'comment': 'Syntax error using slices'
+    'match': '\\[\\](\\s+)'
+    'captures':
+      '1':
+        'name': 'invalid.illegal.slice.eol'
+  }
+  {
+    'comment': 'Syntax error numeric literals'
+    'match': '\\b0[0-7]*[89]\\d*\\b'
+    'name': 'invalid.illegal.numeric.eol'
+  }
+  {
+    'comment': 'Built-in functions'
+    'match': '\\b(append|cap|close|complex|copy|delete|imag|len|make|new|panic|print|println|real|recover)\\b(?=\\()'
+    'name': 'support.function.builtin.eol'
+  }
+  {
+    'comment': 'Function declarations'
+    'match': '^(\\bfunc\\b)(?:\\s+(\\([^\\)]+\\)\\s+)?([a-zA-Z_]\\w*)(?=\\())?'
+    'captures':
+      '1':
+        'name': 'keyword.function.eol'
+      '2':
+        'patterns': [
+          {
+            'include': '#brackets'
+          }
+          {
+            'include': '#operators'
+          }
+        ]
+      '3':
+        'name': 'entity.name.function'
+  }
+  {
+    'comment': 'Functions'
+    'match': '(\\bfunc\\b)|([a-zA-Z_]\\w*)(?=\\()'
+    'captures':
+      '1':
+        'name': 'keyword.function.eol'
+      '2':
+        'name': 'support.function.eol'
+  }
+  {
+    'comment': 'Floating-point literals'
+    'match': '(\\.\\d+([Ee][\-\+]\\d+)?i?)\\b|\\b\\d+\\.\\d*(([Ee][\-\+]\\d+)?i?\\b)?'
+    'name': 'constant.numeric.floating-point.eol'
+  }
+  {
+    'comment': 'Integers'
+    'match': '\\b((0x[0-9a-fA-F]+)|(0[0-7]+i?)|(\\d+([Ee]\\d+)?i?)|(\\d+[Ee][\-\+]\\d+i?))\\b'
+    'name': 'constant.numeric.integer.eol'
+  }
+  {
+    'comment': 'Language constants'
+    'match': '\\b(true|false|nil|iota)\\b'
+    'name': 'constant.language.eol'
+  }
+  {
+    'comment': 'Package declarations'
+    'match': '(?<=package)\\s+([a-zA-Z_]\\w*)'
+    'captures':
+      '1':
+        'name': 'entity.name.package.eol'
+  }
+  {
+    'comment': 'Type declarations'
+    'match': '(?<=type)\\s+([a-zA-Z_]\\w*)'
+    'captures':
+      '1':
+        'name': 'entity.name.type.eol'
+  }
+  {
+    'comment': 'Shorthand variable declaration and assignments'
+    'match': '[a-zA-Z_]\\w*(?:,\\s*[a-zA-Z_]\\w*)*(?=\\s*:=)'
+    'captures':
+      '0':
+        'patterns': [
+          {
+            'match': '[a-zA-Z_]\\w*'
+            'name': 'variable.other.assignment.eol'
+          }
+          {
+            'include': '#delimiters'
+          }
+        ]
+  }
+  {
+    'comment': 'Assignments to existing variables'
+    'match': '(?<!var )\\s*([a-zA-Z_]\\w*(?:,\\s*[a-zA-Z_]\\w*)*)(?=\\s*=[^=])'
+    'captures':
+      '1':
+        'patterns': [
+          {
+            'match': '[a-zA-Z_]\\w*'
+            'name': 'variable.other.assignment.eol'
+          }
+          {
+            'include': '#delimiters'
+          }
+        ]
+  }
+  {
+    'comment': 'Single line variable declarations/assignments'
+    'match': '(?<=var)\\s+(.*)$'
+    'captures':
+      '1':
+        'patterns': [
+          {
+            'include': '#variables'
+          }
+        ]
+  }
+  {
+    'comment': 'Multiline variable declarations/assignments'
+    'begin': '(\\bvar\\b)\\s+(\\()'
+    'beginCaptures':
+      '1':
+        'name': 'keyword.var.eol'
+      '2':
+        'name': 'punctuation.other.bracket.round.eol'
+    'end': '\\)'
+    'endCaptures':
+      '0':
+        'name': 'punctuation.other.bracket.round.eol'
+    'patterns': [
+      {
+        'include': '#variables'
+      }
+    ]
+  }
+  {
+    'comment': 'Terminators'
+    'match': ';'
+    'name': 'punctuation.terminator.eol'
+  }
+  {
+    'include': '#brackets'
+  }
+  {
+    'include': '#delimiters'
+  }
+  {
+    'include': '#keywords'
+  }
+  {
+    'include': '#operators'
+  }
+  {
+    'include': '#runes'
+  }
+  {
+    'include': '#storage_types'
+  }
+]
+'repository':
+  'brackets':
+    'patterns': [
+      {
+        'match': '\\{|\\}'
+        'name': 'punctuation.other.bracket.curly.eol'
+      }
+      {
+        'match': '\\(|\\)'
+        'name': 'punctuation.other.bracket.round.eol'
+      }
+      {
+        'match': '\\[|\\]'
+        'name': 'punctuation.other.bracket.square.eol'
+      }
+    ]
+  'delimiters':
+    'patterns': [
+      {
+        'match': ','
+        'name': 'punctuation.other.comma.eol'
+      }
+      {
+        'match': '\\.(?!\\.\\.)'
+        'name': 'punctuation.other.period.eol'
+      }
+      {
+        'match': ':(?!=)'
+        'name': 'punctuation.other.colon.eol'
+      }
+    ]
+  'keywords':
+    'patterns': [
+      {
+        'comment': 'Flow control keywords'
+        'match': '\\b(break|case|continue|default|defer|else|fallthrough|for|go|goto|if|range|return|select|switch)\\b'
+        'name': 'keyword.control.eol'
+      }
+      {
+        'match': '\\bchan\\b'
+        'name': 'keyword.channel.eol'
+      }
+      {
+        'match': '\\bconst\\b'
+        'name': 'keyword.const.eol'
+      }
+      {
+        'match': '\\bfunction\\b'
+        'name': 'keyword.function.eol'
+      }
+      {
+        'match': '\\boperation\\b'
+        'name': 'keyword.function.eol'
+      }
+      {
+        'match': '\\binterface\\b'
+        'name': 'keyword.interface.eol'
+      }
+      {
+        'match': '\\bimport\\b'
+        'name': 'keyword.import.eol'
+      }
+      {
+        'match': '\\bmap\\b'
+        'name': 'keyword.map.eol'
+      }
+      {
+        'match': '\\bpackage\\b'
+        'name': 'keyword.package.eol'
+      }
+      {
+        'match': '\\bstruct\\b'
+        'name': 'keyword.struct.eol'
+      }
+      {
+        'match': '\\btype\\b'
+        'name': 'keyword.type.eol'
+      }
+      {
+        'match': '\\bvar\\b'
+        'name': 'keyword.var.eol'
+      }
+    ]
+  'operators':
+    'comment': 'Note that the order here is very important!'
+    'patterns': [
+      {
+        'match': '(\\*|&)(?=\\w)'
+        'name': 'keyword.operator.address.eol'
+      }
+      {
+        'match': '<\\-'
+        'name': 'keyword.operator.channel.eol'
+      }
+      {
+        'match': '\\-\\-'
+        'name': 'keyword.operator.decrement.eol'
+      }
+      {
+        'match': '\\+\\+'
+        'name': 'keyword.operator.increment.eol'
+      }
+      {
+        'match': '(==|!=|<=|>=|<[^<]|>[^>])'
+        'name': 'keyword.operator.comparison.eol'
+      }
+      {
+        'match': '(&&|\\|\\||!)'
+        'name': 'keyword.operator.logical.eol'
+      }
+      {
+        'match': '(=|\\+=|\\-=|\\|=|\\^=|\\*=|/=|:=|%=|<<=|>>=|&\\^=|&=)'
+        'name': 'keyword.operator.assignment.eol'
+      }
+      {
+        'match': '(\\+|\\-|\\*|/|%)'
+        'name': 'keyword.operator.arithmetic.eol'
+      }
+      {
+        'match': '(&(?!\\^)|\\||\\^|&\\^|<<|>>)'
+        'name': 'keyword.operator.arithmetic.bitwise.eol'
+      }
+      {
+        'match': '\\.\\.\\.'
+        'name': 'keyword.operator.ellipsis.eol'
+      }
+    ]
+  'runes':
+    'patterns': [
+      {
+        'match': '\\\'(\\\\([0-7]{3}|[abfnrtv\\\\\'"]|x[0-9a-fA-F]{2}|u[0-9a-fA-F]{4}|U[0-9a-fA-F]{8})|\\\p{Any})\\\''
+        'name': 'constant.other.rune.eol'
+      }
+      {
+        'match': '\\\'.*\\\''
+        'name': 'invalid.illegal.unknown-rune.eol'
+      }
+    ]
+  'storage_types':
+    'patterns': [
+      {
+        'match': '\\bbool\\b'
+        'name': 'storage.type.boolean.eol'
+      }
+      {
+        'match': '\\bbyte\\b'
+        'name': 'storage.type.byte.eol'
+      }
+      {
+        'match': '\\berror\\b'
+        'name': 'storage.type.error.eol'
+      }
+      {
+        'match': '\\b(complex(64|128)|float(32|64)|u?int(8|16|32|64)?)\\b'
+        'name': 'storage.type.numeric.eol'
+      }
+      {
+        'match': '\\brune\\b'
+        'name': 'storage.type.rune.eol'
+      }
+      {
+        'match': '\\bstring\\b'
+        'name': 'storage.type.string.eol'
+      }
+      {
+        'match': '\\buintptr\\b'
+        'name': 'storage.type.uintptr.eol'
+      }
+    ]
+  'string_escaped_char':
+    'patterns': [
+      {
+        'match': '\\\\([0-7]{3}|[abfnrtv\\\\\'"]|x[0-9a-fA-F]{2}|u[0-9a-fA-F]{4}|U[0-9a-fA-F]{8})'
+        'name': 'constant.character.escape.eol'
+      }
+      {
+        'match': '\\\\[^0-7xuUabfnrtv\\\'"]'
+        'name': 'invalid.illegal.unknown-escape.eol'
+      }
+    ]
+  'string_placeholder':
+    'patterns': [
+      {
+        'match': '%(\\[\\d+\\])?([\\+#\\-0\\x20]{,2}((\\d+|\\*)?(\\.?(\\d+|\\*|(\\[\\d+\\])\\*?)?(\\[\\d+\\])?)?))?[vT%tbcdoqxXUbeEfFgGsp]'
+        'name': 'constant.other.placeholder.eol'
+      }
+    ]
+  'variables':
+    'comment': 'First add tests and make sure existing tests still pass when changing anything here!'
+    'patterns': [
+      {
+        'match': '([a-zA-Z_]\\w*(?:,\\s*[a-zA-Z_]\\w*)*)\\s*(=.*)'
+        'captures':
+          '1':
+            'patterns': [
+              {
+                'match': '[a-zA-Z_]\\w*'
+                'name': 'variable.other.assignment.eol'
+              }
+              {
+                'include': '#delimiters'
+              }
+            ]
+          '2':
+            'patterns': [
+              {
+                'include': '$self'
+              }
+            ]
+      }
+      {
+        'match': '([a-zA-Z_]\\w*(?:,\\s*[a-zA-Z_]\\w*)*)(\\s+[\\*]?[a-zA-Z_]\\w*\\s*)(=.*)'
+        'captures':
+          '1':
+            'patterns': [
+              {
+                'match': '[a-zA-Z_]\\w*'
+                'name': 'variable.other.assignment.eol'
+              }
+              {
+                'include': '#delimiters'
+              }
+            ]
+          '2':
+            'patterns': [
+              {
+                'include': '$self'
+              }
+            ]
+          '3':
+            'patterns': [
+              {
+                'include': '$self'
+              }
+            ]
+      }
+      {
+        'match': '([a-zA-Z_]\\w*(?:,\\s*[a-zA-Z_]\\w*)*)(\\s+[\\*]?[a-zA-Z_]\\w*\\s*[^=].*)'
+        'captures':
+          '1':
+            'patterns': [
+              {
+                'match': '[a-zA-Z_]\\w*'
+                'name': 'variable.other.declaration.eol'
+              }
+              {
+                'include': '#delimiters'
+              }
+            ]
+          '2':
+            'patterns': [
+              {
+                'include': '$self'
+              }
+            ]
+      }
+    ]
